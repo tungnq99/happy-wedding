@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventType {
+  CEREMONY
+  RECEPTION
+  OTHER
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Wedding {
+  id                String   @id @default(cuid())
+  ownerClerkId      String
+  slug              String   @unique
+  title             String
+  groomName         String
+  brideName         String
+  eventDate         DateTime
+  heroSubtitle      String?
+  story             String?
+  coverImageUrl     String?
+  bankQrImageUrl    String?
+  bankAccountName   String?
+  bankAccountNumber String?
+  bankName          String?
+
+  groomBankQrImageUrl    String?
+  groomBankName          String?
+  groomBankAccountNumber String?
+  groomBankAccountName   String?
+
+  brideBankQrImageUrl    String?
+  brideBankName          String?
+  brideBankAccountNumber String?
+  brideBankAccountName   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  events Event[]
+  stories Story[]
+  guests Guest[]
+  media  Media[]
+  rsvps  RSVP[]
+  wishes Wish[]
+  theme  Theme?
+
+  @@index([ownerClerkId])
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  weddingId String
+  name      String
+  type      EventType @default(OTHER)
+  startsAt  DateTime
+  venueName String
+  address   String
+  mapsUrl   String?
+  sortOrder Int       @default(0)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, sortOrder])
+}
+
+model Guest {
+  id        String  @id @default(cuid())
+  weddingId String
+  name      String
+  phone     String?
+  groupName String?
+  inviteCode String?
+  createdAt DateTime @default(now())
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, groupName])
+  @@unique([weddingId, inviteCode])
+}
+
+model RSVP {
+  id        String   @id @default(cuid())
+  weddingId String
+  guestName String
+  phone     String?
+  attending Boolean
+  seats     Int      @default(1)
+  message   String?
+  createdAt DateTime @default(now())
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, attending])
+}
+
+model Wish {
+  id         String   @id @default(cuid())
+  weddingId  String
+  guestName  String
+  content    String
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, createdAt])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  weddingId String
+  type      MediaType @default(IMAGE)
+  url       String
+  caption   String?
+  sortOrder Int       @default(0)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, sortOrder])
+}
+
+model Theme {
+  id             String @id @default(cuid())
+  weddingId      String @unique
+  primaryColor   String @default("#9d5a4a")
+  secondaryColor String @default("#f5ebe0")
+  accentColor    String @default("#3b2a2a")
+  headingFont    String @default("Playfair Display")
+  bodyFont       String @default("Be Vietnam Pro")
+  musicUrl       String?
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+}
+
+model Story {
+  id        String   @id @default(cuid())
+  weddingId String
+  dateText  String
+  title     String
+  content   String
+  imageUrl  String?
+  sortOrder Int      @default(0)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, sortOrder])
+}
