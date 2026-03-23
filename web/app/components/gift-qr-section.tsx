@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { useState } from "react";
@@ -54,7 +54,7 @@ export function GiftQrSection({
       bankAccountNumber: brideBankAccountNumber,
       bankAccountName: brideBankAccountName,
     },
-  ].filter((card) => Boolean(card.qrImageUrl || card.bankName || card.bankAccountName || card.bankAccountNumber));
+  ].filter((card) => Boolean(card.qrImageUrl || card.bankName || card.bankAccountName || card.bankAccountNumber)) as BankCard[];
 
   if (cards.length === 0) {
     return null;

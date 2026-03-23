@@ -108,7 +108,11 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
     });
 
     const uploadJson = (await uploadRes.json()) as UploadUrlResponse;
-    if (!uploadRes.ok || !uploadJson.ok) {
+    if (!uploadRes.ok) {
+      throw new Error("Cannot create upload URL.");
+    }
+
+    if (!uploadJson.ok) {
       throw new Error(uploadJson.error || "Cannot create upload URL.");
     }
 

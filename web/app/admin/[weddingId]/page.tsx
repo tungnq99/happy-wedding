@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import { format } from "date-fns";
@@ -155,17 +155,57 @@ export default async function WeddingDetailPage({ params }: Props) {
     { key: "le-cuoi", name: "Lễ cưới", type: "RECEPTION" as const },
   ];
 
+  type PrimaryEventTemplate = (typeof defaultEventTemplates)[number];
+  type WeddingEventLike = {
+    id: string;
+    name: string;
+    type?: "CEREMONY" | "RECEPTION" | "OTHER" | null;
+    startsAt: Date;
+    venueName: string;
+    address: string;
+    mapsUrl?: string | null;
+    sortOrder?: number | null;
+  };
+
+  type WeddingWishLike = {
+    id: string;
+    guestName: string;
+    content: string;
+  };
+
+  type WeddingStoryLike = {
+    id: string;
+    dateText: string;
+    title: string;
+    content: string;
+    imageUrl?: string | null;
+    sortOrder?: number | null;
+  };
+
+  type WeddingRsvpLike = {
+    id: string;
+    guestName: string;
+    attending: boolean;
+    seats: number;
+    message?: string | null;
+  };
+
+  const weddingEvents = wedding.events as WeddingEventLike[];
+  const weddingWishes = wedding.wishes as WeddingWishLike[];
+  const weddingStories = wedding.stories as WeddingStoryLike[];
+  const weddingRsvps = wedding.rsvps as WeddingRsvpLike[];
+
   const primaryEventCards = defaultEventTemplates.map((template) => {
     const matched =
-      wedding.events.find((event) => event.type === template.type) ??
-      wedding.events.find((event) => event.name.toLowerCase() === template.name.toLowerCase()) ??
+      weddingEvents.find((event) => event.type === template.type) ??
+      weddingEvents.find((event) => event.name.toLowerCase() === template.name.toLowerCase()) ??
       null;
 
-    return { template, event: matched };
-  });
+    return { template: template as PrimaryEventTemplate, event: matched as WeddingEventLike | null };
+  }) as Array<{ template: PrimaryEventTemplate; event: WeddingEventLike | null }>;
 
   const primaryEventIds = new Set(primaryEventCards.filter((card) => card.event).map((card) => card.event!.id));
-  const extraEvents = wedding.events.filter((event) => !primaryEventIds.has(event.id));
+  const extraEvents: WeddingEventLike[] = weddingEvents.filter((event) => !primaryEventIds.has(event.id));
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -273,13 +313,13 @@ export default async function WeddingDetailPage({ params }: Props) {
         <aside className="rounded-2xl border border-zinc-200 bg-white p-5">
           <h2 className="text-xl font-semibold">Lời chúc gần đây</h2>
           <div className="mt-4 grid gap-3">
-            {wedding.wishes.map((wish) => (
+            {weddingWishes.map((wish) => (
               <div key={wish.id} className="rounded-xl border border-zinc-200 p-3 text-sm">
                 <p className="font-medium">{wish.guestName}</p>
                 <p className="text-zinc-600">{wish.content}</p>
               </div>
             ))}
-            {wedding.wishes.length === 0 && <p className="text-zinc-500">Chưa có lời chúc nào.</p>}
+            {weddingWishes.length === 0 && <p className="text-zinc-500">Chưa có lời chúc nào.</p>}
           </div>
         </aside>
       </div>
@@ -411,7 +451,7 @@ export default async function WeddingDetailPage({ params }: Props) {
         </form>
 
         <div className="mt-4 grid gap-4">
-          {wedding.stories.map((story) => (
+          {weddingStories.map((story) => (
             <div key={story.id} className="rounded-xl border border-zinc-200 p-4">
               <form action={updateStoryAction} className="grid gap-3 md:grid-cols-2">
                 <input type="hidden" name="weddingId" value={wedding.id} />
@@ -451,7 +491,7 @@ export default async function WeddingDetailPage({ params }: Props) {
             </div>
           ))}
 
-          {wedding.stories.length === 0 && <p className="text-zinc-500">Chưa có mốc timeline nào.</p>}
+          {weddingStories.length === 0 && <p className="text-zinc-500">Chưa có mốc timeline nào.</p>}
         </div>
       </section>
 
@@ -461,7 +501,7 @@ export default async function WeddingDetailPage({ params }: Props) {
         <article className="rounded-2xl border border-zinc-200 bg-white p-5">
           <h2 className="text-xl font-semibold">RSVP gần đây</h2>
           <div className="mt-4 grid gap-3">
-            {wedding.rsvps.map((rsvp) => (
+            {weddingRsvps.map((rsvp) => (
               <div key={rsvp.id} className="rounded-xl border border-zinc-200 p-3 text-sm">
                 <p className="font-medium">{rsvp.guestName}</p>
                 <p className="text-zinc-600">
@@ -470,20 +510,20 @@ export default async function WeddingDetailPage({ params }: Props) {
                 {rsvp.message && <p className="text-zinc-500">{rsvp.message}</p>}
               </div>
             ))}
-            {wedding.rsvps.length === 0 && <p className="text-zinc-500">Chưa có RSVP nào.</p>}
+            {weddingRsvps.length === 0 && <p className="text-zinc-500">Chưa có RSVP nào.</p>}
           </div>
         </article>
 
         <article className="rounded-2xl border border-zinc-200 bg-white p-5">
           <h2 className="text-xl font-semibold">Lời chúc gần đây</h2>
           <div className="mt-4 grid gap-3">
-            {wedding.wishes.map((wish) => (
+            {weddingWishes.map((wish) => (
               <div key={wish.id} className="rounded-xl border border-zinc-200 p-3 text-sm">
                 <p className="font-medium">{wish.guestName}</p>
                 <p className="text-zinc-600">{wish.content}</p>
               </div>
             ))}
-            {wedding.wishes.length === 0 && <p className="text-zinc-500">Chưa có lời chúc nào.</p>}
+            {weddingWishes.length === 0 && <p className="text-zinc-500">Chưa có lời chúc nào.</p>}
           </div>
         </article>
       </section>
