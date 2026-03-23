@@ -3,6 +3,9 @@ import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const createSchema = z.object({
   weddingId: z.string().min(1),
   url: z.string().url(),
