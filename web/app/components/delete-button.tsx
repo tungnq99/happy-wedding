@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -34,7 +34,7 @@ export function DeleteButton({ confirmMessage, label, className }: Props) {
         title="Xác nhận xóa"
         message={confirmMessage}
         confirmText="Xóa"
-        cancelText="Huỷ"
+        cancelText="Hủy"
         destructive={true}
         loading={pending}
         onCancel={() => setOpen(false)}

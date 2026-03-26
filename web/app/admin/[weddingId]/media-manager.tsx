@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
@@ -285,7 +285,7 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
               onClick={() => setIsExpanded((open) => !open)}
               className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
             >
-              {isExpanded ? "?n album" : `Xem album (${media.length})`}
+              {isExpanded ? "Ẩn album" : `Xem album (${media.length})`}
             </button>
 
             <label className="cursor-pointer rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">
@@ -307,7 +307,7 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
           <input
             value={manualUrl}
             onChange={(event) => setManualUrl(event.target.value)}
-            placeholder="Th�m ?nh b?ng URL https://..."
+            placeholder="Thêm ảnh bằng URL https://..."
             className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm"
             disabled={isUploading || isPending}
           />
@@ -333,7 +333,7 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
 
         {!isExpanded && media.length > 0 && (
           <div className="mt-5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5 text-sm text-zinc-500">
-            Album dang du?c thu g?n d? trang ch?nh s?a m? nhanh hon. B?m "Xem album" khi b?n c?n ki?m tra ?nh.
+            Album đang được thu gọn để trang chỉnh sửa mở nhanh hơn. Bấm "Xem album" khi bạn cần kiểm tra ảnh.
           </div>
         )}
 

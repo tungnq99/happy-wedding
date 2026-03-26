@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -17,7 +17,7 @@ export function ConfirmDialog({
   title = "Xác nhận thao tác",
   message,
   confirmText = "Xác nhận",
-  cancelText = "Huỷ",
+  cancelText = "Hủy",
   destructive = false,
   loading = false,
   onConfirm,
@@ -48,7 +48,7 @@ export function ConfirmDialog({
             disabled={loading}
             className={`rounded-full px-4 py-2 text-sm text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${destructive ? "bg-red-600 hover:bg-red-500" : "bg-zinc-900 hover:bg-zinc-800"}`}
           >
-            {loading ? "Đang xử lí..." : confirmText}
+            {loading ? "Đang xử lý..." : confirmText}
           </button>
         </div>
       </div>
