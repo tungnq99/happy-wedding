@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
@@ -19,7 +19,7 @@ export function SubmitButton({
   const { pending } = useFormStatus();
 
   let baseClass = "inline-flex h-10 items-center justify-center rounded-xl px-6 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none ";
-  
+
   if (variant === "primary") {
     baseClass += "bg-zinc-900 text-white hover:bg-zinc-800";
   } else if (variant === "danger") {

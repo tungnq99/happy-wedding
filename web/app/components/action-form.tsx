@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import toast from "react-hot-toast";
@@ -19,13 +19,13 @@ export function ActionForm({
   resetOnSuccess = false,
 }: ActionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   const handleSubmit = async (formData: FormData) => {
     try {
       await action(formData);
       toast.success(successMessage);
       if (resetOnSuccess) {
-         formRef.current?.reset();
+        formRef.current?.reset();
       }
     } catch (error: any) {
       toast.error(error.message || "Đã xảy ra lỗi, vui lòng thử lại.");
