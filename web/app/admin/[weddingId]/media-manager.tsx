@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
@@ -48,6 +48,9 @@ type XhrResult = {
   responseText: string;
 };
 
+const INITIAL_VISIBLE_COUNT = 12;
+const LOAD_MORE_COUNT = 12;
+
 function xhrUpload(
   url: string,
   options: {
@@ -95,6 +98,11 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
   const [status, setStatus] = useState<string>("");
   const [manualUrl, setManualUrl] = useState("");
   const [progress, setProgress] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+
+  const visibleMedia = isExpanded ? media.slice(0, visibleCount) : [];
+  const hasMoreMedia = visibleCount < media.length;
 
   async function uploadOneFile(file: File, onProgress: (percent: number) => void) {
     const uploadRes = await fetch("/api/upload-url", {
@@ -181,6 +189,8 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
     }
 
     setIsUploading(true);
+    setIsExpanded(true);
+    setVisibleCount((current) => Math.max(current, INITIAL_VISIBLE_COUNT));
     setProgress(0);
     setStatus("Uploading images...");
 
@@ -238,6 +248,7 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
     }
 
     setStatus("Adding image from URL...");
+    setIsExpanded(true);
     const res = await fetch("/api/admin/media", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -260,22 +271,51 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
   return (
     <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">Wedding album</h2>
-        <label className="cursor-pointer rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">
-          {isUploading ? "Uploading..." : "Upload images"}
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-            disabled={isUploading || isPending}
-          />
-        </label>
+        <div>
+          <h2 className="text-xl font-semibold">Wedding album</h2>
+          <p className="mt-2 text-sm text-zinc-500">Uploaded photos will appear on the public gallery.</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsExpanded((open) => !open)}
+            className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+          >
+            {isExpanded ? "?n album" : `Xem album (${media.length})`}
+          </button>
+
+          <label className="cursor-pointer rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">
+            {isUploading ? "Uploading..." : "Upload images"}
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={isUploading || isPending}
+            />
+          </label>
+        </div>
       </div>
 
-      <p className="mt-2 text-sm text-zinc-500">Uploaded photos will appear on the public gallery.</p>
+      <form onSubmit={handleAddManualUrl} className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <input
+          value={manualUrl}
+          onChange={(event) => setManualUrl(event.target.value)}
+          placeholder="Thêm ?nh b?ng URL https://..."
+          className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm"
+          disabled={isUploading || isPending}
+        />
+        <button
+          type="submit"
+          className="rounded-full border border-zinc-300 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!manualUrl.trim() || isUploading || isPending}
+        >
+          Add URL
+        </button>
+      </form>
 
       {isUploading && (
         <div className="mt-3">
@@ -288,31 +328,58 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
 
       {status && <p className="mt-3 text-sm text-zinc-600">{status}</p>}
 
-      <div className="mt-5 max-h-[720px] overflow-y-auto pr-1">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {media.map((item) => (
-          <article key={item.id} className="overflow-hidden rounded-xl border border-zinc-200">
-            <div className="relative aspect-[4/3] w-full">
-              <Image src={item.url} alt={item.caption ?? "Wedding photo"} fill className="object-cover " />
+      {!isExpanded && media.length > 0 && (
+        <div className="mt-5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5 text-sm text-zinc-500">
+          Album dang du?c thu g?n d? trang ch?nh s?a m? nhanh hon. B?m "Xem album" khi b?n c?n ki?m tra ?nh.
+        </div>
+      )}
+
+      {isExpanded && (
+        <div className="mt-5">
+          <div className="max-h-[720px] overflow-y-auto pr-1">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleMedia.map((item) => (
+                <article key={item.id} className="overflow-hidden rounded-xl border border-zinc-200">
+                  <div className="relative aspect-[4/3] w-full bg-zinc-100">
+                    <Image
+                      src={item.url}
+                      alt={item.caption ?? "Wedding photo"}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 20rem, (min-width: 640px) 45vw, 100vw"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 p-3 text-sm">
+                    <span className="truncate text-zinc-600">{item.caption || `Image #${item.sortOrder + 1}`}</span>
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(item.id)}
+                      className="rounded-full border border-red-300 px-3 py-1 text-xs text-red-700"
+                      disabled={isUploading || isPending}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </article>
+              ))}
             </div>
-            <div className="flex items-center justify-between gap-2 p-3 text-sm">
-              <span className="truncate text-zinc-600">{item.caption || `Image #${item.sortOrder + 1}`}</span>
+          </div>
+
+          {hasMoreMedia && (
+            <div className="mt-4 flex justify-center">
               <button
                 type="button"
-                onClick={() => void handleDelete(item.id)}
-                className="rounded-full border border-red-300 px-3 py-1 text-xs text-red-700"
-                disabled={isUploading || isPending}
+                onClick={() => setVisibleCount((current) => Math.min(current + LOAD_MORE_COUNT, media.length))}
+                className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
               >
-                Delete
+                Xem thêm ?nh
               </button>
             </div>
-          </article>
-        ))}
-              </div>
-      </div>
+          )}
+        </div>
+      )}
 
       {media.length === 0 && <p className="mt-4 text-zinc-500">No images yet.</p>}
     </section>
   );
 }
-
