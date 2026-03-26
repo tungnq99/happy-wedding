@@ -123,7 +123,7 @@ function Countdown({ target }: { target: Date }) {
 // ═══════════════════════════════════════════════════════════════════
 export function InvitationPage({ data, isDemo = false }: Props) {
   const color = data.theme?.primaryColor ?? "#f1a4a4";
-  const introHeartBaseId = useId();
+  const introHeartBaseId = `intro-heart-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const introHeartClipId = `${introHeartBaseId}-heart`;
   const introHeartLeftClipId = `${introHeartBaseId}-left`;
   const introHeartRightClipId = `${introHeartBaseId}-right`;
@@ -722,6 +722,7 @@ export function InvitationPage({ data, isDemo = false }: Props) {
     </div>
   );
 }
+
 
 
 
