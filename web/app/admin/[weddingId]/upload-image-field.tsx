@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -84,6 +84,7 @@ export function UploadImageField({ label, fieldName, weddingSlug, initialUrl = "
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
 
   async function handlePickFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -158,6 +159,7 @@ export function UploadImageField({ label, fieldName, weddingSlug, initialUrl = "
       }
 
       setValue(uploadedUrl);
+      setIsPreviewVisible(true);
       setProgress(100);
       setStatus("Upload done.");
     } catch (error) {
@@ -169,6 +171,8 @@ export function UploadImageField({ label, fieldName, weddingSlug, initialUrl = "
       }
     }
   }
+
+  const hasPreview = Boolean(value);
 
   return (
     <div className="grid gap-2">
@@ -187,11 +191,25 @@ export function UploadImageField({ label, fieldName, weddingSlug, initialUrl = "
             disabled={isUploading}
           />
         </label>
+
+        {hasPreview && (
+          <button
+            type="button"
+            className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-50"
+            onClick={() => setIsPreviewVisible((visible) => !visible)}
+          >
+            {isPreviewVisible ? "Hide preview" : "Show preview"}
+          </button>
+        )}
+
         {value && (
           <button
             type="button"
             className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-50"
-            onClick={() => setValue("")}
+            onClick={() => {
+              setValue("");
+              setIsPreviewVisible(false);
+            }}
           >
             Clear
           </button>
@@ -204,9 +222,22 @@ export function UploadImageField({ label, fieldName, weddingSlug, initialUrl = "
         </div>
       )}
 
-      {value && (
-        <div className="relative mt-1 aspect-[16/9] w-full max-w-md overflow-hidden rounded-lg border border-zinc-200">
-          <Image src={value} alt={label} fill className="object-cover" />
+      {hasPreview && !isPreviewVisible && (
+        <div className="mt-1 rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-4 py-3 text-xs text-zinc-500">
+          Preview is hidden on initial load to keep the admin editor fast. Click "Show preview" when needed.
+        </div>
+      )}
+
+      {hasPreview && isPreviewVisible && (
+        <div className="relative mt-1 aspect-[16/9] w-full max-w-md overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+          <Image
+            src={value}
+            alt={label}
+            fill
+            className="object-cover"
+            sizes="(min-width: 1024px) 28rem, (min-width: 768px) 60vw, 100vw"
+            unoptimized
+          />
         </div>
       )}
 

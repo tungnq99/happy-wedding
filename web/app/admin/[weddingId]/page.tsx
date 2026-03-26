@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
@@ -14,7 +15,7 @@ import {
   updateWeddingAction,
 } from "../actions";
 import { DeleteButton } from "@/app/components/delete-button";
-import { MediaManager } from "./media-manager";
+import { MediaSection } from "./media-section";
 import { UploadImageField } from "./upload-image-field";
 import { ActionForm } from "@/app/components/action-form";
 import { SubmitButton } from "@/app/components/submit-button";
@@ -30,6 +31,23 @@ function toDatetimeLocal(date: Date) {
   const hours = String(date.getHours()).padStart(2, "0");
   const mins = String(date.getMinutes()).padStart(2, "0");
   return `${year}-${month}-${day}T${hours}:${mins}`;
+}
+
+function MediaSectionFallback() {
+  return (
+    <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="h-7 w-40 animate-pulse rounded bg-zinc-200" />
+          <div className="mt-2 h-4 w-64 animate-pulse rounded bg-zinc-100" />
+        </div>
+        <div className="h-10 w-28 animate-pulse rounded-full bg-zinc-100" />
+      </div>
+      <div className="mt-5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5 text-sm text-zinc-500">
+        Ðang t?i album ?nh...
+      </div>
+    </section>
+  );
 }
 
 export default async function WeddingDetailPage({ params }: Props) {
@@ -62,10 +80,7 @@ export default async function WeddingDetailPage({ params }: Props) {
           orderBy: { createdAt: "desc" },
           take: 20,
         },
-        media: {
-          where: { type: "IMAGE" },
-          orderBy: { sortOrder: "asc" },
-        },
+
         _count: {
           select: {
             rsvps: true,
@@ -119,10 +134,7 @@ export default async function WeddingDetailPage({ params }: Props) {
           orderBy: { createdAt: "desc" },
           take: 20,
         },
-        media: {
-          where: { type: "IMAGE" },
-          orderBy: { sortOrder: "asc" },
-        },
+
         _count: {
           select: {
             rsvps: true,
@@ -486,7 +498,9 @@ export default async function WeddingDetailPage({ params }: Props) {
         </div>
       </section>
 
-      <MediaManager weddingId={wedding.id} weddingSlug={wedding.slug} media={wedding.media} />
+      <Suspense fallback={<MediaSectionFallback />}>
+        <MediaSection weddingId={wedding.id} weddingSlug={wedding.slug} />
+      </Suspense>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <article className="rounded-2xl border border-zinc-200 bg-white p-5">
@@ -521,3 +535,8 @@ export default async function WeddingDetailPage({ params }: Props) {
     </main>
   );
 }
+
+
+
+
+
