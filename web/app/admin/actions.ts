@@ -1,10 +1,11 @@
-﻿"use server";
+"use server";
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildWeddingSlug } from "@/lib/slug";
+import { EventType } from "@prisma/client";
 
 async function requireUser() {
   const { userId } = await auth();
@@ -412,6 +413,54 @@ export async function deleteStoryAction(formData: FormData) {
   await prisma.story.delete({
     where: { id: storyId },
   });
+
+  revalidatePath(`/admin/${weddingId}`);
+}
+
+export async function upsertBothFixedEventsAction(formData: FormData) {
+  const userId = await requireUser();
+  const weddingId = String(formData.get("weddingId") || "");
+  await assertWeddingOwner(weddingId, userId);
+
+  const types: EventType[] = ["CEREMONY", "RECEPTION"];
+
+  for (const typeStr of types) {
+    const name = String(formData.get(`${typeStr}_name`) || "").trim();
+    const startsAt = String(formData.get(`${typeStr}_startsAt`) || "").trim();
+    const venueName = String(formData.get(`${typeStr}_venueName`) || "").trim();
+    const address = String(formData.get(`${typeStr}_address`) || "").trim();
+    const mapsUrl = String(formData.get(`${typeStr}_mapsUrl`) || "").trim();
+
+    const existing = await prisma.event.findFirst({
+      where: { weddingId, type: typeStr },
+    });
+
+    if (existing) {
+      await prisma.event.update({
+        where: { id: existing.id },
+        data: {
+          name,
+          startsAt: startsAt ? new Date(startsAt) : existing.startsAt,
+          venueName,
+          address,
+          mapsUrl: mapsUrl || null,
+        },
+      });
+    } else {
+      await prisma.event.create({
+        data: {
+          weddingId,
+          type: typeStr,
+          name: name || (typeStr === "CEREMONY" ? "Lễ vu quy" : "Tiệc cưới"),
+          startsAt: startsAt ? new Date(startsAt) : new Date(),
+          venueName,
+          address,
+          mapsUrl: mapsUrl || null,
+          sortOrder: typeStr === "RECEPTION" ? 2 : 1,
+        },
+      });
+    }
+  }
 
   revalidatePath(`/admin/${weddingId}`);
 }

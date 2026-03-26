@@ -9,13 +9,15 @@ import {
   deleteEventAction,
   deleteStoryAction,
   updateEventAction,
-  updatePrimaryEventsAction,
+  upsertBothFixedEventsAction,
   updateStoryAction,
   updateWeddingAction,
 } from "../actions";
 import { DeleteButton } from "@/app/components/delete-button";
 import { MediaManager } from "./media-manager";
 import { UploadImageField } from "./upload-image-field";
+import { ActionForm } from "@/app/components/action-form";
+import { SubmitButton } from "@/app/components/submit-button";
 
 type Props = {
   params: Promise<{ weddingId: string }>;
@@ -233,7 +235,7 @@ export default async function WeddingDetailPage({ params }: Props) {
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-zinc-200 bg-white p-5 lg:col-span-2">
           <h2 className="text-xl font-semibold">Thông tin landing</h2>
-          <form action={updateWeddingAction} className="mt-4 grid gap-4">
+          <ActionForm action={updateWeddingAction} successMessage="Đã lưu thông tin chung thành công" className="mt-4 grid gap-4">
             <input type="hidden" name="weddingId" value={wedding.id} />
 
             <label className="grid gap-2">
@@ -306,8 +308,8 @@ export default async function WeddingDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <button className="w-fit rounded-full bg-zinc-900 px-5 py-2.5 text-white">{"Lưu nội dung"}</button>
-          </form>
+            <SubmitButton className="w-fit rounded-full px-5 py-2.5" loadingText="Đang lưu...">Lưu nội dung</SubmitButton>
+          </ActionForm>
         </section>
 
         <aside className="rounded-2xl border border-zinc-200 bg-white p-5">
@@ -327,64 +329,53 @@ export default async function WeddingDetailPage({ params }: Props) {
       <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5">
         <h2 className="text-xl font-semibold">Quản lý sự kiện</h2>
         <p className="mt-1 text-sm text-zinc-500">Lễ vu quy và Lễ cưới.</p>
-        <form action={updatePrimaryEventsAction} className="mt-4">
+        
+        <ActionForm action={upsertBothFixedEventsAction} successMessage="Đã cập nhật Lễ vu quy và Tiệc cưới">
           <input type="hidden" name="weddingId" value={wedding.id} />
-
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
             {primaryEventCards.map(({ template, event }) => (
               <div key={template.key} className="relative rounded-xl border border-zinc-200 p-4">
                 <p className="mb-3 text-sm font-semibold text-zinc-700">{template.name}</p>
 
-                {event && (
-                  <button
-                    formAction={deleteEventAction}
-                    name="eventId"
-                    value={event.id}
-                    className="absolute right-3 top-3 h-8 w-8 rounded-full border border-red-300 text-sm text-red-700"
-                    title={"X\u00F3a s\u1EF1 ki\u1EC7n"}
-                  >
-                    {"X"}
-                  </button>
-                )}
-
-                <input type="hidden" name={"eventId_" + template.type} value={event?.id ?? ""} />
-
                 <div className="grid gap-3">
                   <label className="grid gap-1">
                     <span className="text-xs text-zinc-500">Tên sự kiện</span>
-                    <input name={"name_" + template.type} defaultValue={event?.name ?? template.name} className="rounded-lg border border-zinc-300 px-3 py-2" />
+                    <input name={`${template.type}_name`} defaultValue={event?.name ?? template.name} className="rounded-lg border border-zinc-300 px-3 py-2" />
                   </label>
                   <label className="grid gap-1">
                     <span className="text-xs text-zinc-500">Thời gian</span>
-                    <input type="datetime-local" name={"startsAt_" + template.type} defaultValue={toDatetimeLocal(event?.startsAt ?? wedding.eventDate)} className="rounded-lg border border-zinc-300 px-3 py-2" />
+                    <input type="datetime-local" name={`${template.type}_startsAt`} defaultValue={toDatetimeLocal(event?.startsAt ?? wedding.eventDate)} className="rounded-lg border border-zinc-300 px-3 py-2" />
                   </label>
                   <label className="grid gap-1">
                     <span className="text-xs text-zinc-500">Địa điểm</span>
-                    <input required name={"venueName_" + template.type} defaultValue={event?.venueName ?? ""} placeholder={"Tên địa điểm"} className="rounded-lg border border-zinc-300 px-3 py-2" />
+                    <input required name={`${template.type}_venueName`} defaultValue={event?.venueName ?? ""} placeholder="Tên địa điểm" className="rounded-lg border border-zinc-300 px-3 py-2" />
                   </label>
                   <label className="grid gap-1">
                     <span className="text-xs text-zinc-500">Địa chỉ</span>
-                    <input required name={"address_" + template.type} defaultValue={event?.address ?? ""} placeholder="Địa chỉ" className="rounded-lg border border-zinc-300 px-3 py-2" />
+                    <input required name={`${template.type}_address`} defaultValue={event?.address ?? ""} placeholder="Địa chỉ" className="rounded-lg border border-zinc-300 px-3 py-2" />
                   </label>
                   <label className="grid gap-1">
                     <span className="text-xs text-zinc-500">Google Maps URL</span>
-                    <input name={"mapsUrl_" + template.type} defaultValue={event?.mapsUrl ?? ""} placeholder="Google Maps URL" className="rounded-lg border border-zinc-300 px-3 py-2" />
+                    <input name={`${template.type}_mapsUrl`} defaultValue={event?.mapsUrl ?? ""} placeholder="Google Maps URL" className="rounded-lg border border-zinc-300 px-3 py-2" />
                   </label>
                 </div>
               </div>
             ))}
           </div>
-
-          <button className="mt-4 w-fit rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">Lưu tất cả sự kiện chính</button>
-        </form>
-
+          
+          <div className="mt-5 text-right">
+            <SubmitButton className="w-full lg:w-fit rounded-lg px-8 py-2.5" loadingText="Đang lưu...">
+              Lưu toàn bộ sự kiện chính
+            </SubmitButton>
+          </div>
+        </ActionForm>
         {extraEvents.length > 0 && (
           <div className="mt-6">
             <p className="mb-3 text-sm font-semibold text-zinc-700">Sự kiện khác</p>
             <div className="grid gap-4">
               {extraEvents.map((event) => (
                 <div key={event.id} className="rounded-xl border border-zinc-200 p-4">
-                  <form action={updateEventAction} className="grid gap-3 md:grid-cols-2">
+                  <ActionForm action={updateEventAction} successMessage="Đã lưu sự kiện" className="grid gap-3 md:grid-cols-2">
                     <input type="hidden" name="weddingId" value={wedding.id} />
                     <input type="hidden" name="eventId" value={event.id} />
 
@@ -409,14 +400,14 @@ export default async function WeddingDetailPage({ params }: Props) {
                       <input name="mapsUrl" defaultValue={event.mapsUrl ?? ""} className="rounded-lg border border-zinc-300 px-3 py-2" />
                     </label>
 
-                    <button className="w-fit rounded-full bg-zinc-900 px-4 py-2 text-sm text-white md:col-span-2">Lưu sự kiện</button>
-                  </form>
+                    <SubmitButton className="md:col-span-2 rounded-full w-fit">Lưu sự kiện</SubmitButton>
+                  </ActionForm>
 
-                  <form action={deleteEventAction} className="mt-2">
+                  <ActionForm action={deleteEventAction} successMessage="Đã xóa sự kiện" className="mt-2 text-right">
                     <input type="hidden" name="weddingId" value={wedding.id} />
                     <input type="hidden" name="eventId" value={event.id} />
-                    <DeleteButton confirmMessage="Xóa sự kiện này?" label="Xóa sự kiện" className="rounded-full border border-red-300 px-4 py-2 text-sm text-red-700" />
-                  </form>
+                    <SubmitButton variant="danger" className="rounded-full px-4 py-2.5 text-sm">Xóa sự kiện này</SubmitButton>
+                  </ActionForm>
                 </div>
               ))}
             </div>
@@ -427,7 +418,7 @@ export default async function WeddingDetailPage({ params }: Props) {
       <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5">
         <h2 className="text-xl font-semibold">Quản lý timeline</h2>
 
-        <form action={createStoryAction} className="mt-4 grid gap-3 rounded-xl border border-zinc-200 p-4 md:grid-cols-2">
+        <ActionForm action={createStoryAction} resetOnSuccess={true} successMessage="Đã thêm mốc Timeline mới" className="mt-4 grid gap-3 rounded-xl border border-zinc-200 p-4 md:grid-cols-2">
           <input type="hidden" name="weddingId" value={wedding.id} />
           <label className="grid gap-1">
             <span className="text-xs text-zinc-500">Mốc thời gian</span>
@@ -446,14 +437,14 @@ export default async function WeddingDetailPage({ params }: Props) {
             <input name="imageUrl" placeholder="https://..." className="rounded-lg border border-zinc-300 px-3 py-2" />
           </label>
           <div className="md:col-span-2">
-            <button className="rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">Thêm mốc timeline</button>
+            <SubmitButton className="rounded-full px-5 py-2.5" loadingText="Đang thêm...">Thêm mốc timeline</SubmitButton>
           </div>
-        </form>
+        </ActionForm>
 
         <div className="mt-4 grid gap-4">
           {weddingStories.map((story) => (
             <div key={story.id} className="rounded-xl border border-zinc-200 p-4">
-              <form action={updateStoryAction} className="grid gap-3 md:grid-cols-2">
+              <ActionForm action={updateStoryAction} successMessage="Đã lưu thông tin Timeline" className="grid gap-3 md:grid-cols-2">
                 <input type="hidden" name="weddingId" value={wedding.id} />
                 <input type="hidden" name="storyId" value={story.id} />
 
@@ -475,11 +466,11 @@ export default async function WeddingDetailPage({ params }: Props) {
                 </label>
 
                 <div className="flex gap-2 md:col-span-2">
-                  <button className="rounded-full bg-zinc-900 px-4 py-2 text-sm text-white">Lưu timeline</button>
+                  <SubmitButton className="rounded-full w-fit">Lưu sửa đổi</SubmitButton>
                 </div>
-              </form>
+              </ActionForm>
 
-              <form action={deleteStoryAction} className="mt-2">
+              <ActionForm action={deleteStoryAction} successMessage="Mốc timeline đã bị xóa" className="mt-2 pt-2 border-t border-zinc-100 text-right">
                 <input type="hidden" name="weddingId" value={wedding.id} />
                 <input type="hidden" name="storyId" value={story.id} />
                 <DeleteButton
@@ -487,7 +478,7 @@ export default async function WeddingDetailPage({ params }: Props) {
                   label="Xóa timeline"
                   className="rounded-full border border-red-300 px-4 py-2 text-sm text-red-700"
                 />
-              </form>
+              </ActionForm>
             </div>
           ))}
 

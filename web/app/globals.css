@@ -24,7 +24,7 @@ h1, h2, h3, h4 {
 }
 
 .font-script {
-  font-family: 'Dancing Script', cursive;
+  font-family: var(--font-script), 'Great Vibes', 'Dancing Script', cursive;
 }
 
 /* ── Fade Up ──────────────────────────────────────────────────── */

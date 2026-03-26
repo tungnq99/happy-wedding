@@ -34,7 +34,7 @@ export function MusicPlayer({ primaryColor, autoPlayTrigger = false }: { primary
         audio.play().then(() => {
           setPlaying(true);
           setShowTooltip(false);
-        }).catch(() => {});
+        }).catch(() => { });
       }
     }
   }, [autoPlayTrigger]);
@@ -107,47 +107,6 @@ export function MusicPlayer({ primaryColor, autoPlayTrigger = false }: { primary
           )}
         </button>
       </div>
-
-      {/* Track info */}
-      <button
-        onClick={() => setExpanded((v) => !v)}
-        className="flex h-10 items-center gap-2 overflow-hidden rounded-full bg-white/95 px-3 shadow-lg transition hover:shadow-xl"
-        style={{ border: `1px solid ${primaryColor}33` }}
-      >
-        {/* Wave bars */}
-        <div className="flex h-5 items-end gap-[3px]">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <span
-              key={n}
-              className={playing ? `wave-bar-${n}` : ""}
-              style={{
-                display: "block",
-                width: 3,
-                height: playing ? undefined : 6,
-                borderRadius: 2,
-                background: primaryColor,
-                minHeight: 4,
-                maxHeight: 20,
-              }}
-            />
-          ))}
-        </div>
-        <span className="max-w-[110px] truncate text-xs text-gray-600">{track.title}</span>
-      </button>
-
-      {/* Next track */}
-      {expanded && (
-        <button
-          onClick={next}
-          aria-label="Bài tiếp theo"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-gray-500 shadow-lg transition hover:text-gray-700"
-          style={{ border: `1px solid ${primaryColor}33` }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }

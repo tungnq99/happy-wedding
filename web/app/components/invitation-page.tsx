@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { format, differenceInSeconds } from "date-fns";
@@ -10,7 +10,7 @@ import { MusicPlayer } from "./music-player";
 import { FallingPetals } from "@/app/components/falling-petals";
 import { InvitationGate } from "./invitation-gate";
 import { GiftQrSection } from "@/app/components/gift-qr-section";
-import { ThreeDPhotoCarousel } from "@/components/ui/3d-carousel";
+import { BookGallery } from "@/app/components/book-gallery";
 import { FloatingMenu } from "./floating-menu";
 
 // ─── Types ───────────────────────────────────────────────────────
@@ -73,11 +73,11 @@ function FloralWatermark({ side = "left", color }: { side?: "left" | "right"; co
 
 function FlipUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative flex h-14 w-16 items-center justify-center sm:h-20 sm:w-24">
-        <span className="text-4xl font-light tracking-widest text-white sm:text-6xl">{String(value).padStart(2, "0")}</span>
+    <div className="flex flex-col items-center gap-1 sm:gap-2">
+      <div className="relative flex h-10 w-11 min-[400px]:h-12 min-[400px]:w-14 items-center justify-center sm:h-20 sm:w-24">
+        <span className="text-3xl min-[400px]:text-4xl font-light tracking-widest text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)] sm:text-6xl">{String(value).padStart(2, "0")}</span>
       </div>
-      <span className="text-[11px] uppercase tracking-[0.4em] text-white/60 font-medium">{label}</span>
+      <span className="text-[9px] min-[400px]:text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-white/90 font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{label}</span>
     </div>
   );
 }
@@ -101,7 +101,7 @@ function Countdown({ target }: { target: Date }) {
 
   if (!mounted) {
     return (
-      <div className="flex justify-center gap-6 sm:gap-10">
+      <div className="flex justify-center gap-3 min-[400px]:gap-5 sm:gap-10">
         {[{ v: 0, l: "Ngày" }, { v: 0, l: "Giờ" }, { v: 0, l: "Phút" }, { v: 0, l: "Giây" }].map(({ v, l }) => (
           <FlipUnit key={l} value={v} label={l} />
         ))}
@@ -110,7 +110,7 @@ function Countdown({ target }: { target: Date }) {
   }
 
   return (
-    <div className="flex justify-center gap-6 sm:gap-10">
+    <div className="flex justify-center gap-3 min-[400px]:gap-5 sm:gap-10">
       {[{ v: t.days, l: "Ngày" }, { v: t.hours, l: "Giờ" }, { v: t.minutes, l: "Phút" }, { v: t.seconds, l: "Giây" }].map(({ v, l }) => (
         <FlipUnit key={l} value={v} label={l} />
       ))}
@@ -295,50 +295,50 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isGateOpen ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.2, delay: 0.3 }}
-                className="mb-12 flex flex-col items-center"
+                className="mb-6 sm:mb-12 flex flex-col items-center"
               >
-                <p className="font-heading text-xl uppercase tracking-[0.8em] text-[#f1a4a4] drop-shadow-md sm:text-2xl mb-4">Save the Date</p>
-                <div className="h-[1px] w-12 bg-white/40" />
+                <p className="font-heading text-base sm:text-xl md:text-2xl uppercase tracking-[0.8em] text-[#f1a4a4] drop-shadow-md mb-2 sm:mb-4">Save the Date</p>
+                <div className="h-[1px] w-8 sm:w-12 bg-white/40" />
               </motion.div>
 
-              <div className="mb-10 flex flex-col items-center">
+              <div className="mb-6 sm:mb-10 flex flex-col items-center">
                 <motion.h1
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={isGateOpen ? { opacity: 1, scale: 1 } : {}}
                   transition={{ duration: 1.5, delay: 0.5 }}
-                  className="font-heading text-6xl font-light uppercase tracking-[0.2em] drop-shadow-2xl sm:text-8xl"
+                  className="font-script text-7xl min-[400px]:text-8xl sm:text-9xl drop-shadow-2xl"
                 >
-                  {data.groomName}
+                  {data.groomName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())}
                 </motion.h1>
 
                 <motion.div
                   initial={{ opacity: 0, rotate: -45 }}
                   animate={isGateOpen ? { opacity: 1, rotate: 0 } : {}}
                   transition={{ duration: 1, delay: 0.8 }}
-                  className="my-6 flex items-center justify-center gap-6 w-full"
+                  className="my-3 flex items-center justify-center gap-4 sm:gap-6 w-full"
                 >
-                  <div className="h-[1px] w-24 bg-white/30" />
-                  <span className="font-script text-5xl text-[#f1a4a4] drop-shadow-sm sm:text-7xl flex-shrink-0">&</span>
-                  <div className="h-[1px] w-24 bg-white/30" />
+                  <div className="h-[1px] w-16 sm:w-24 bg-white/30" />
+                  <span className="font-heading text-4xl min-[400px]:text-5xl sm:text-6xl text-[#f1a4a4] drop-shadow-sm flex-shrink-0">&</span>
+                  <div className="h-[1px] w-16 sm:w-24 bg-white/30" />
                 </motion.div>
 
                 <motion.h1
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={isGateOpen ? { opacity: 1, scale: 1 } : {}}
                   transition={{ duration: 1.2, delay: 0.7 }}
-                  className="font-heading text-6xl font-light uppercase tracking-[0.2em] drop-shadow-2xl sm:text-8xl"
+                  className="font-script text-7xl min-[400px]:text-8xl sm:text-9xl drop-shadow-2xl"
                 >
-                  {data.brideName}
+                  {data.brideName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())}
                 </motion.h1>
               </div>
 
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={isGateOpen ? { opacity: 0.8 } : {}}
+                animate={isGateOpen ? { opacity: 0.9 } : {}}
                 transition={{ duration: 2, delay: 1.2 }}
-                className="mb-12"
+                className="mb-6 sm:mb-12"
               >
-                <p className="border-y border-white/10 py-3 text-sm uppercase font-bold tracking-[0.5em] sm:text-base px-6" suppressHydrationWarning>
+                <p className="border-y border-white/40 py-2 sm:py-3 text-xs uppercase font-bold tracking-[0.5em] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] sm:text-base px-4 sm:px-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm" suppressHydrationWarning>
                   {format(data.eventDate, "dd . MM . yyyy", { locale: vi })}
                 </p>
               </motion.div>
@@ -347,7 +347,7 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isGateOpen ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1, delay: 1.4 }}
-                className="mb-12"
+                className="mb-6 sm:mb-12"
               >
                 <Countdown target={data.eventDate} />
               </motion.div>
@@ -362,7 +362,8 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                   const el = document.getElementById('guestbook');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="rounded-sm bg-white/10 backdrop-blur-sm border border-white/40 px-12 py-4 text-[11px] font-bold uppercase tracking-[0.3em] text-white shadow-xl transition hover:bg-white hover:text-gray-900"
+                style={{ color: color }}
+                className="rounded-sm bg-white/95 px-8 py-3 text-[10px] sm:px-12 sm:py-4 sm:text-[11px] font-bold uppercase tracking-[0.3em] shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition hover:bg-white"
               >
                 Gửi lời chúc
               </motion.button>
@@ -479,7 +480,7 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                     className="space-y-4 text-center"
                   >
                     <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-gray-400">Chú Rể</p>
-                    <p className="font-script mt-2 text-[56px] leading-none" style={{ color }}>{data.groomName}</p>
+                    <p className="font-script mt-2 text-[56px] leading-none" style={{ color }}>{data.groomName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())}</p>
                     <div className="h-[1px] w-12 bg-[#f1a4a4]/40 my-6" />
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f1a4a4]">Gia Đình Nhà Trai</p>
                     <div className="space-y-1 mt-3">
@@ -509,7 +510,7 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                     className="space-y-4 text-center"
                   >
                     <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-gray-400">Cô Dâu</p>
-                    <p className="font-script mt-2 text-[56px] leading-none" style={{ color }}>{data.brideName}</p>
+                    <p className="font-script mt-2 text-[56px] leading-none" style={{ color }}>{data.brideName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())}</p>
                     <div className="h-[1px] w-12 bg-[#f1a4a4]/40 my-6" />
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f1a4a4]">Gia Đình Nhà Gái</p>
                     <div className="space-y-1 mt-3">
@@ -586,14 +587,17 @@ export function InvitationPage({ data, isDemo = false }: Props) {
           )}
 
           {/* SECTION 5: GALLERY */}
-          <section className="bg-white py-24 overflow-hidden">
+          <section className="bg-[#fff9f9] py-24 overflow-hidden">
             <SectionTitle eyebrow="Album Hình Cưới" title="Gallery" color={color} />
-            <div className="mx-auto max-w-7xl px-4">
-              <ThreeDPhotoCarousel images={data.media.map(m => m.url)} />
+            <div className="mx-auto max-w-4xl px-4 sm:px-6">
+              <BookGallery
+                images={galleryImages}
+                primaryColor={color}
+              />
             </div>
           </section>
 
-                    {/* SECTION 6: Tiec Cuoi */}
+          {/* SECTION 6: Tiec Cuoi */}
           {partyEvents.length > 0 && (
             <section className="relative overflow-hidden bg-[#f7e3e1] py-24 lg:py-32">
               <div className="absolute inset-0">
@@ -709,7 +713,7 @@ export function InvitationPage({ data, isDemo = false }: Props) {
 
           {/* FOOTER */}
           <footer className="bg-white py-20 text-center border-t border-gray-50">
-            <p className="font-script text-4xl mb-4" style={{ color }}>{data.groomName} & {data.brideName}</p>
+            <p className="font-script text-4xl mb-4" style={{ color }}>{data.groomName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())} & {data.brideName.toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase())}</p>
             <p className="text-xs uppercase tracking-[0.4em] text-gray-300">Thank You For Everything</p>
             <div className="mx-auto mt-10 h-2 w-2 rounded-full bg-[#f1a4a4]/30" />
           </footer>
