@@ -375,7 +375,7 @@ export function MediaManager({ weddingId, weddingSlug, media }: Props) {
                   onClick={() => setVisibleCount((current) => Math.min(current + LOAD_MORE_COUNT, media.length))}
                   className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
                 >
-                  Xem th�m ?nh
+                  Xem thêm ảnh
                 </button>
               </div>
             )}
