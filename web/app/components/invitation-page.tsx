@@ -4,7 +4,7 @@ import Image from "next/image";
 import { format, differenceInSeconds } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import { WishForm } from "@/app/components/wish-form";
 import { MusicPlayer } from "./music-player";
 import { FallingPetals } from "@/app/components/falling-petals";
@@ -127,6 +127,8 @@ export function InvitationPage({ data, isDemo = false }: Props) {
   const introHeartClipId = `${introHeartBaseId}-heart`;
   const introHeartLeftClipId = `${introHeartBaseId}-left`;
   const introHeartRightClipId = `${introHeartBaseId}-right`;
+  const introHeartRef = useRef<HTMLDivElement>(null);
+  const isIntroHeartInView = useInView(introHeartRef, { once: true, margin: "-10% 0px -10% 0px" });
   const cover = data.coverImageUrl || "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=1600&q=80";
   const galleryImages = data.media.length > 0 ? data.media.map((m) => m.url) : [cover];
   const heroImage = data.media.length > 0 ? galleryImages[0] : cover;
@@ -381,9 +383,9 @@ export function InvitationPage({ data, isDemo = false }: Props) {
             <div className="mx-auto max-w-4xl text-center relative z-10">
               <div className="mb-24 flex justify-center relative z-10 px-4">
                 <motion.div
+                  ref={introHeartRef}
                   initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ margin: "-100px" }}
+                  animate={isIntroHeartInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.95 }}
                   transition={{ duration: 1, ease: "easeOut" }}
                   className="relative h-[370px] w-[360px] sm:h-[440px] sm:w-[430px]"
                 >
@@ -401,9 +403,8 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                     </defs>
 
                     <motion.g
-                      initial={{ x: -34, y: -8, rotate: -8, opacity: 0.9 }}
-                      whileInView={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
-                      viewport={{ once: true, margin: "-60px" }}
+                      initial={false}
+                      animate={isIntroHeartInView ? { x: 0, y: 0, rotate: 0, opacity: 1 } : { x: -34, y: -8, rotate: -8, opacity: 0.9 }}
                       transition={{ duration: 0.85, ease: "easeOut", delay: 0.1 }}
                       clipPath={`url(#${introHeartClipId})`}
                     >
@@ -419,9 +420,8 @@ export function InvitationPage({ data, isDemo = false }: Props) {
                     </motion.g>
 
                     <motion.g
-                      initial={{ x: 34, y: 8, rotate: 8, opacity: 0.9 }}
-                      whileInView={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
-                      viewport={{ once: true, margin: "-60px" }}
+                      initial={false}
+                      animate={isIntroHeartInView ? { x: 0, y: 0, rotate: 0, opacity: 1 } : { x: 34, y: 8, rotate: 8, opacity: 0.9 }}
                       transition={{ duration: 0.85, ease: "easeOut", delay: 0.1 }}
                       clipPath={`url(#${introHeartClipId})`}
                     >
@@ -722,6 +722,11 @@ export function InvitationPage({ data, isDemo = false }: Props) {
     </div>
   );
 }
+
+
+
+
+
 
 
 
